@@ -62,7 +62,7 @@ def loadData(analyzer, crimesfile):
                                 delimiter=",")
     for crime in input_file:
         model.addCrime(analyzer, crime)
-        type(analyzer)
+    
     return analyzer
 
 # ___________________________________________________
@@ -105,13 +105,15 @@ def maxKey(analyzer):
     return model.maxKey(analyzer)
 
 
-def r3(analyzer, initialDate, finalDate):
+def r3(analyzer, date_i, date_f):
     """
     Retorna el total de crimenes en un rango de fechas
     """
-    initialDate = datetime.datetime.strptime(initialDate, '%Y-%m-%d')
-    finalDate = datetime.datetime.strptime(finalDate, '%Y-%m-%d')
-    return model.getCrimesByRange(analyzer, initialDate, finalDate)
+    date_i = datetime.datetime.strptime(date_i, '%Y-%m-%d')
+    date_f = datetime.datetime.strptime(date_f, '%Y-%m-%d')
+    return model.getCrimesByRange(analyzer, date_i.date(), date_f.date())
+
+
 
 
 def getCrimesByRangeCode(analyzer, initialDate,

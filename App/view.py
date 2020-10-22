@@ -37,7 +37,7 @@ operación seleccionada.
 # ___________________________________________________
 
 
-crimefile = 'us_accidents_small.csv'
+crimefile = 'us_accidents_small - copia.csv'
 
 # ___________________________________________________
 #  Menu principal
@@ -76,17 +76,14 @@ while True:
         print('Elementos en el arbol: ' + str(controller.indexSize(cont)))
         print('Menor Llave: ' + str(controller.minKey(cont)))
         print('Mayor Llave: ' + str(controller.maxKey(cont)))
-        print(type(cont))
-        print(cont.keys())
+
         
-
-
     elif int(inputs[0]) == 3:
         print("\nBuscando crimenes en un rango de fechas: ")
         initialDate = input("Rango Inicial (YYYY-MM-DD): ")
         finalDate = input("Rango Inicial (YYYY-MM-DD): ")
         total = controller.r3(cont, initialDate, finalDate)
-        print("\nTotal de crimenes en el rango de fechas: " + total)
+        print("\nTotal de crimenes en el rango de fechas: " + str(total))
 
     elif int(inputs[0]) == 4:
         print("\nBuscando crimenes x grupo de ofensa en una fecha: ")

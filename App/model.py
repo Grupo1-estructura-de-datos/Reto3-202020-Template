@@ -181,7 +181,13 @@ def maxKey(analyzer):
     Llave mas grande
     """
     return om.maxKey(analyzer['dateIndex'])
-
+def getCrimesBefore(analyzer,Date):
+    min = minkey(analyzer)
+    lst = om.values(analyzer['dateIndex'], min, Date)
+    lstiterator = it.newIterator(lst)
+    while (it.hasNext(lstiterator)):
+        lstdate = it.next(lstiterator)
+        return lstdate
 
 def getCrimesByRange(analyzer, initialDate, finalDate):
     """
