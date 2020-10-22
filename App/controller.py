@@ -112,9 +112,15 @@ def r3(analyzer, date_i, date_f):
     date_i = datetime.datetime.strptime(date_i, '%Y-%m-%d')
     date_f = datetime.datetime.strptime(date_f, '%Y-%m-%d')
     return model.getCrimesByRange(analyzer, date_i.date(), date_f.date())
+"""
+def r2(analyzer, date_min):
+ 
+    date_min = datetime.datetime.strptime(date_min, "%Y-%m-%d") 
+    min = model.minKey(analyzer)
+    total = model.req3(analyzer,min.date(),date_min.date())
 
-
-
+    return 1
+"""
 
 def getCrimesByRangeCode(analyzer, initialDate,
                          offensecode):

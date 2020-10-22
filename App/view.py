@@ -49,9 +49,9 @@ def printMenu():
     print("*******************************************")
     print("Bienvenido")
     print("1- Inicializar Analizador")
-    print("2- Cargar información de crimenes")
-    print("3- Consultar crimenes en un rango de fechas")
-    print("4- Consultar crimenes por codigo y fecha")
+    print("2- Cargar información de accidentes")
+    print("3- Consultar accidentes anteriores a una fecha")
+    print("4- Consultar accidentes en un rango de fechas")
     print("0- Salir")
     print("*******************************************")
 
@@ -77,23 +77,20 @@ while True:
         print('Menor Llave: ' + str(controller.minKey(cont)))
         print('Mayor Llave: ' + str(controller.maxKey(cont)))
 
-        
     elif int(inputs[0]) == 3:
-        print("\nBuscando crimenes en un rango de fechas: ")
+        print("\nBuscando accidentes anteriores a una fecha: ")
+        initialDate = input("Fecha (YYYY-MM-DD): ")
+        accidentesBefore = controller.r2(cont,initialDate)
+        
+        print("\nTotal accidentes antes de la fecha" + str(initialDate) + str(accidentesBefore))
+
+        
+    elif int(inputs[0]) == 4:
+        print("\nBuscando accidentes en un rango de fechas: ")
         initialDate = input("Rango Inicial (YYYY-MM-DD): ")
         finalDate = input("Rango Inicial (YYYY-MM-DD): ")
         total = controller.r3(cont, initialDate, finalDate)
-        print("\nTotal de crimenes en el rango de fechas: " + str(total))
-
-    elif int(inputs[0]) == 4:
-        print("\nBuscando crimenes x grupo de ofensa en una fecha: ")
-        initialDate = input("Fecha (YYYY-MM-DD): ")
-        offensecode = input("Codigo de ofensa: ")
-        numoffenses = controller.getCrimesByRangeCode(cont, initialDate,
-                                                      offensecode)
-        print("\nTotal de ofensas tipo: " + offensecode + " en esa fecha:  " +
-              str(numoffenses))
-
+        print("\nTotal de accidentes en el rango de fechas: " + str(total))
     else:
         sys.exit(0)
 sys.exit(0)
