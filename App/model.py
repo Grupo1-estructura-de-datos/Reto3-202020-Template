@@ -209,7 +209,7 @@ def most_accidents(analyzer,initialDate, finalDate):
     while (it.hasNext(lstiterator)):
         lstdate = it.next(lstiterator)        
         mas_accidentes = 0
-    accidentes = 
+        accidentes = lt.size(lstdate['lstcrimes'])
         if 
 def getCrimesByRangeCode(analyzer, initialDate, offensecode):
     """
