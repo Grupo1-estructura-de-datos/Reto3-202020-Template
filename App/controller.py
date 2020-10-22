@@ -106,12 +106,10 @@ def maxKey(analyzer):
 
 
 def r3(analyzer, date_i, date_f):
-    """
-    Retorna el total de crimenes en un rango de fechas
-    """
     date_i = datetime.datetime.strptime(date_i, '%Y-%m-%d')
     date_f = datetime.datetime.strptime(date_f, '%Y-%m-%d')
-    return model.getCrimesByRange(analyzer, date_i.date(), date_f.date())
+
+    return model.req3(analyzer, date_i.date(), date_f.date())
 
 
 

@@ -189,10 +189,7 @@ def getCrimesBefore(analyzer,Date):
         lstdate = it.next(lstiterator)
         return lstdate
 
-def getCrimesByRange(analyzer, initialDate, finalDate):
-    """
-    Retorna el numero de crimenes en un rago de fechas.
-    """
+def req3(analyzer, initialDate, finalDate):
     lst = om.values(analyzer['dateIndex'], initialDate, finalDate)
     lstiterator = it.newIterator(lst)
     totcrimes = 0
