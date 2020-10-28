@@ -26,6 +26,7 @@ from DISClib.ADT import orderedmap as om
 from DISClib.DataStructures import mapentry as me
 from DISClib.ADT import map as m
 import datetime
+from math import radians, cos, sin, asin, sqrt 
 assert config
 
 """
@@ -54,11 +55,17 @@ def newAnalyzer():
     Retorna el analizador inicializado.
     """
     analyzer = {'crimes': None,
-                'dateIndex': None
+                'dateIndex': None,
+                'dateIndex2': None,
+                'hourIndex': None
                 }
 
-    analyzer['crimes'] = lt.newList("ARRAY_LIST", compareIds)
+    analyzer['crimes'] = lt.newList('SINGLE_LINKED', compareIds)
     analyzer['dateIndex'] = om.newMap(omaptype='RBT',
+                                      comparefunction=compareDates)
+    analyzer['dateIndex2'] = om.newMap(omaptype='RBT',
+                                      comparefunction=compareDates)
+    analyzer['hourIndex'] = om.newMap(omaptype='RBT',
                                       comparefunction=compareDates)
     return analyzer
 
@@ -71,6 +78,8 @@ def addCrime(analyzer, crime):
     """
     lt.addLast(analyzer['crimes'], crime)
     updateDateIndex(analyzer['dateIndex'], crime)
+    updateDateIndex2(analyzer['dateIndex2'], crime)
+    updateHourIndex(analyzer['hourIndex'], crime)
     return analyzer
 
 
@@ -94,6 +103,46 @@ def updateDateIndex(map, crime):
     addDateIndex(datentry, crime)
     return map
 
+def updateDateIndex2(map, crime):
+    """
+    Se toma la fecha del crimen y se busca si ya existe en el arbol
+    dicha fecha.  Si es asi, se adiciona a su lista de crimenes
+    y se actualiza el indice de tipos de crimenes.
+
+    Si no se encuentra creado un nodo para esa fecha en el arbol
+    se crea y se actualiza el indice de tipos de crimenes
+    """
+    occurreddate = crime['Start_Time']
+    crimedate = datetime.datetime.strptime(occurreddate, '%Y-%m-%d %H:%M:%S')
+    entry = om.get(map, crimedate.date())
+    if entry is None:
+        datentry = newDataEntry(crime)
+        om.put(map, crimedate.date(), datentry)
+    else:
+        datentry = me.getValue(entry)
+    addDateIndex2(datentry, crime)
+    return map
+
+def updateHourIndex(map, crime):
+    """
+    Se toma la fecha del crimen y se busca si ya existe en el arbol
+    dicha fecha.  Si es asi, se adiciona a su lista de crimenes
+    y se actualiza el indice de tipos de crimenes.
+
+    Si no se encuentra creado un nodo para esa fecha en el arbol
+    se crea y se actualiza el indice de tipos de crimenes
+    """
+    occurreddate = crime['Start_Time'][-8:-3]
+    occurreddate = "1900-01-01 " + occurreddate
+    crimedate = datetime.datetime.strptime(occurreddate, '%Y-%m-%d %H:%M')
+    entry = om.get(map, crimedate.time())
+    if entry is None:
+        datentry = newDataEntry(crime)
+        om.put(map, crimedate.time(), datentry)
+    else:
+        datentry = me.getValue(entry)
+    addDateIndex(datentry, crime)
+    return map
 
 def addDateIndex(datentry, crime):
     """
@@ -115,6 +164,26 @@ def addDateIndex(datentry, crime):
         lt.addLast(entry['lstoffenses'], crime)
     return datentry
 
+def addDateIndex2(datentry, crime):
+    """
+    Actualiza un indice de tipo de crimenes.  Este indice tiene una lista
+    de crimenes y una tabla de hash cuya llave es el tipo de crimen y
+    el valor es una lista con los crimenes de dicho tipo en la fecha que
+    se está consultando (dada por el nodo del arbol)
+    """
+    lst = datentry['lstcrimes']
+    lt.addLast(lst, crime)
+    offenseIndex = datentry['offenseIndex']
+    offentry = m.get(offenseIndex, crime['State'])
+    if (offentry is None):
+        entry = newOffenseEntry(crime['State'], crime)
+        lt.addLast(entry['lstoffenses'], crime)
+        m.put(offenseIndex, crime['State'], entry)
+    else:
+        entry = me.getValue(offentry)
+        lt.addLast(entry['lstoffenses'], crime)
+    return datentry
+
 
 def newDataEntry(crime):
     """
@@ -125,7 +194,7 @@ def newDataEntry(crime):
     entry['offenseIndex'] = m.newMap(numelements=30,
                                      maptype='PROBING',
                                      comparefunction=compareOffenses)
-    entry['lstcrimes'] = lt.newList('"ARRAY_LIST"', compareDates)
+    entry['lstcrimes'] = lt.newList('SINGLE_LINKED', compareDates)
     return entry
 
 
@@ -136,11 +205,8 @@ def newOffenseEntry(offensegrp, crime):
     """
     ofentry = {'offense': None, 'lstoffenses': None}
     ofentry['offense'] = offensegrp
-    ofentry['lstoffenses'] = lt.newList("ARRAY_LIST", compareOffenses)
+    ofentry['lstoffenses'] = lt.newList('SINGLELINKED', compareOffenses)
     return ofentry
-
-
-
 
 
 # ==============================
@@ -182,48 +248,52 @@ def maxKey(analyzer):
     """
     return om.maxKey(analyzer['dateIndex'])
 
+def entryFecha(cont,initialDate):
+    dia = me.getValue(om.get(cont["dateIndex"],initialDate))["offenseIndex"]
+    return dia
 
-def getCrimesBefore(analyzer,Date):
-    min = minKey(analyzer)
-    lst = om.values(analyzer['dateIndex'], min, Date)
-    lstiterator = it.newIterator(lst)
-    while (it.hasNext(lstiterator)):
-        lstdate = it.next(lstiterator)
-        return lstdate
+def entreTiempos(cont,initialDate,finalDate,dix,k=False):
+    if k==False:
+        initialDate = om.floor(cont[dix],initialDate)
+        finalDate = om.floor(cont[dix],finalDate)
+    llaves = om.values(cont[dix],initialDate,finalDate)
+    return llaves
 
-def getCrimesByRange(analyzer, initialDate, finalDate):
-    """
-    Retorna el numero de crimenes en un rago de fechas.
-    """
-    lst = om.values(analyzer['dateIndex'], initialDate, finalDate)
-    lstiterator = it.newIterator(lst)
-    totcrimes = 0
-    while (it.hasNext(lstiterator)):
-        lstdate = it.next(lstiterator)
-        totcrimes += lt.size(lstdate['lstcrimes'])
-    return totcrimes
+def entryFechaAntes(cont,initialDate):
+    initialDate = om.floor(cont["dateIndex"],initialDate)
+    fechaMenor = om.minKey(cont["dateIndex"])
+    llaves = om.values(cont["dateIndex"],fechaMenor,initialDate)
+    return llaves
 
-def most_accidents(analyzer,initialDate, finalDate):
-    lst = om.values(analyzer['dateIndex'], initialDate, finalDate)
-    lstiterator = it.newIterator(lst)
-    while (it.hasNext(lstiterator)):
-        lstdate = it.next(lstiterator)        
-        mas_accidentes = 0
-        accidentes = lt.size(lstdate['lstcrimes'])
-        if 
-def getCrimesByRangeCode(analyzer, initialDate, offensecode):
-    """
-    Para una fecha determinada, retorna el numero de crimenes
-    de un tipo especifico.
-    """
-    crimedate = om.get(analyzer['dateIndex'], initialDate)
-    if crimedate['key'] is not None:
-        offensemap = me.getValue(crimedate)['offenseIndex']
-        numoffenses = m.get(offensemap, offensecode)
-        if numoffenses is not None:
-            return m.size(me.getValue(numoffenses)['lstoffenses'])
-        return 0
+def EntreFechas(cont,initialDate,finalDate):
+    return entreTiempos(cont,initialDate,finalDate,"dateIndex")
 
+def EntreFechas2(cont,initialDate,finalDate):
+    return entreTiempos(cont,initialDate,finalDate,"dateIndex2")
+
+def EntreHoras(cont,initialDate,finalDate):
+    return entreTiempos(cont,initialDate,finalDate,"hourIndex",True)
+
+def distance(lat1, lat2, lon1, lon2): 
+    # The math module contains a function named 
+    # radians which converts from degrees to radians. 
+    lon1 = radians(lon1) 
+    lon2 = radians(lon2) 
+    lat1 = radians(lat1) 
+    lat2 = radians(lat2) 
+       
+    # Haversine formula  
+    dlon = lon2 - lon1  
+    dlat = lat2 - lat1 
+    a = sin(dlat / 2)**2 + cos(lat1) * cos(lat2) * sin(dlon / 2)**2
+  
+    c = 2 * asin(sqrt(a))  
+     
+    # Radius of earth in kilometers. Use 3956 for miles 
+    r = 3956
+       
+    # calculate the result 
+    return(c * r) 
 
 # ==============================
 # Funciones de Comparacion
