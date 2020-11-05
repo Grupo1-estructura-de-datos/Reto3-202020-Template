@@ -1,1 +1,1 @@
-Luis Alejandro Rubiano Guerrero - 202013482 - la.rubiano@uniandes.edu.co Daniel Orlando Cañon Lopez - 202011679 - d.canonl@uniandes.edu.co Andres Felipe Rosas Castillo - 202013471 - a.rosasc@uniandes.edu.co REQ 1 y 2 Luis Rubiano. Andres Rosas REQ 3. Daniel Cañon REQ 4. REQ 5 Grupal
+Luis Alejandro Rubiano Guerrero - 202013482 - la.rubiano@uniandes.edu.co Daniel Orlando Cañon Lopez - 202011679 - d.canonl@uniandes.edu.co Andres Felipe Rosas Castillo - 202013471 - a.rosasc@uniandes.edu.co 
